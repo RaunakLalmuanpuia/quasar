@@ -37,7 +37,7 @@
             <q-tabs align="left">
                 <q-route-tab
                     v-if="$page.props.user.roles.includes('employer')"
-                    :href="route('report.create')"
+                    :href="route('report.index')"
                     label="Employer Report"
                 />
                 <q-route-tab

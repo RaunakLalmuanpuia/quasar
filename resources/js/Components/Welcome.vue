@@ -12,7 +12,16 @@ const lorem = 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque 
 
 <template>
     <div>
-            <div class="mb-4">
+                    <div
+                        v-if="$page.props.flash.message"
+                        class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg dark:bg-green-200 dark:text-green-800"
+                        role="alert"
+                    >
+                        <span class="font-medium">
+                            {{ $page.props.flash.message }}
+                        </span>
+                    </div>    
+        <div class="mb-4">
                 <q-btn label="Open Modal" color="primary" @click="fixed = true" />
                 <q-dialog v-model="fixed">
                     <q-card>
@@ -36,10 +45,14 @@ const lorem = 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque 
                 </q-dialog>
             </div> 
         
-            
+            <div class="q-pa-md">
+                <q-video :ratio="16/9"
+            src="https://www.youtube.com/embed/3lvz_6jE12E"
+            />
 
-
-        
+            </div>
+           
+   
                     <!-- carousel -->
                     <q-carousel
                         v-model="slide"
@@ -52,29 +65,29 @@ const lorem = 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque 
                         padding
                         arrows
                         height="300px"
-                        class="bg-primary text-white shadow-1 rounded-borders"
+                        class="text-white bg-primary shadow-1 rounded-borders"
                     >
                         <q-carousel-slide name="style" class="column no-wrap flex-center">
                         <q-icon name="style" size="56px" />
-                        <div class="q-mt-md text-center">
+                        <div class="text-center q-mt-md">
                             {{ lorem }}
                         </div>
                         </q-carousel-slide>
                         <q-carousel-slide name="tv" class="column no-wrap flex-center">
                         <q-icon name="live_tv" size="56px" />
-                        <div class="q-mt-md text-center">
+                        <div class="text-center q-mt-md">
                             {{ lorem }}
                         </div>
                         </q-carousel-slide>
                         <q-carousel-slide name="layers" class="column no-wrap flex-center">
                         <q-icon name="layers" size="56px" />
-                        <div class="q-mt-md text-center">
+                        <div class="text-center q-mt-md">
                             {{ lorem }}
                         </div>
                         </q-carousel-slide>
                         <q-carousel-slide name="map" class="column no-wrap flex-center">
                         <q-icon name="terrain" size="56px" />
-                        <div class="q-mt-md text-center">
+                        <div class="text-center q-mt-md">
                             {{ lorem }}
                         </div>
                         </q-carousel-slide>

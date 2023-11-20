@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('reports', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('employee_file');
-            $table->string('employer_file');
-            $table->string('manager_file');
+            $table->string('employee_file')->nullable();
+            $table->string('employer_file')->nullable();
+            $table->string('manager_file')->nullable();
             $table->enum('employer_status', ['accepted', 'rejected', 'pending'])->default('pending')->nullable();
             $table->enum('manager_status', ['accepted', 'rejected', 'pending'])->default('pending')->nullable();
             $table->date('movement');

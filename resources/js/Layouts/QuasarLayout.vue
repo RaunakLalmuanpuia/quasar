@@ -1,6 +1,6 @@
 <template>
     <q-layout view="hHh lpR fFf">
-        <q-header elevated class="bg-primary text-white" height-hint="98">
+        <q-header elevated class="text-white bg-primary" height-hint="98">
             <q-toolbar>
                 <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
 
@@ -37,11 +37,11 @@
             <q-tabs align="left">
                 <q-route-tab
                     v-if="$page.props.user.roles.includes('employer')"
-                    :href="route('dashboard')"
+                    :href="route('report.create')"
                     label="Employer Report"
                 />
                 <q-route-tab
-                    v-if="$page.props.user.roles.includes('nanager')"
+                    v-if="$page.props.user.roles.includes('manager')"
                     :href="route('dashboard')"
                     label="Manager"
                 />
@@ -140,7 +140,7 @@
             <slot></slot>
         </q-page-container>
 
-        <q-footer elevated class="bg-grey-8 text-white">
+        <q-footer elevated class="text-white bg-grey-8">
             <q-toolbar align="middle">
                 <q-toolbar-title>
                     <q-avatar>

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Report extends Model
 {
     use HasFactory;
@@ -22,6 +22,21 @@ class Report extends Model
         'employee_id',
         'employer_id',
         'manager_id'
-
     ];
+    public function users(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function employee(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'employee_id');
+    }
+    public function employer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'employer_id');
+    }
+    public function manager(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'manager_id');
+    }
 }

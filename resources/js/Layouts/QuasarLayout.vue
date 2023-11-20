@@ -35,7 +35,21 @@
             </q-toolbar>
 
             <q-tabs align="left">
-                <q-route-tab :href="route('dashboard')" label="Upload Report" />
+                <q-route-tab
+                    v-if="$page.props.user.roles.includes('employer')"
+                    :href="route('dashboard')"
+                    label="Employer Report"
+                />
+                <q-route-tab
+                    v-if="$page.props.user.roles.includes('nanager')"
+                    :href="route('dashboard')"
+                    label="Manager"
+                />
+                <q-route-tab
+                    v-if="$page.props.user.roles.includes('employee')"
+                    :href="route('report.create')"
+                    label="Upload Report"
+                />
                 <q-route-tab to="/page2" label="View Report" />
                 <q-route-tab to="/page3" label="Contact" />
                 <q-route-tab
@@ -56,7 +70,7 @@
                     active-class="my-menu-link"
                 >
                     <q-item-section avatar>
-                    <q-icon name="inbox" />
+                        <q-icon name="inbox" />
                     </q-item-section>
 
                     <q-item-section>Inbox</q-item-section>
@@ -70,7 +84,7 @@
                     active-class="my-menu-link"
                 >
                     <q-item-section avatar>
-                    <q-icon name="send" />
+                        <q-icon name="send" />
                     </q-item-section>
 
                     <q-item-section>Outbox</q-item-section>
@@ -84,7 +98,7 @@
                     active-class="my-menu-link"
                 >
                     <q-item-section avatar>
-                    <q-icon name="delete" />
+                        <q-icon name="delete" />
                     </q-item-section>
 
                     <q-item-section>Trash</q-item-section>
@@ -100,7 +114,7 @@
                     active-class="my-menu-link"
                 >
                     <q-item-section avatar>
-                    <q-icon name="settings" />
+                        <q-icon name="settings" />
                     </q-item-section>
 
                     <q-item-section>Settings</q-item-section>
@@ -114,7 +128,7 @@
                     active-class="my-menu-link"
                 >
                     <q-item-section avatar>
-                    <q-icon name="help" />
+                        <q-icon name="help" />
                     </q-item-section>
 
                     <q-item-section>Help</q-item-section>
@@ -145,7 +159,7 @@
 import { ref } from "vue";
 import { router } from "@inertiajs/vue3";
 
-const link = ref('');
+const link = ref("");
 
 const leftDrawerOpen = ref(false);
 const toggleLeftDrawer = () => {

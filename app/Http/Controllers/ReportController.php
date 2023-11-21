@@ -108,11 +108,28 @@ class ReportController extends Controller
             return redirect()->route('dashboard')->with('message', 'Report Submitted Successfully!');
         }
         if (Auth::user()->hasRole('employer')) {
-        } else {
-            abort(401, 'Unauthorized');
+            $request->validate([
+                'status' => 'required',
+                'filepath' => 'required|file',
+                'manager' => 'required'
+            ]);
+            $file = $request->file('filepath');
+            $filepath = $file->store('public/reports');
+            Report::where('id', $request->selectedReport)
+            ->update([
+                'employer_status' => $request->status,
+                'employer_file' => $filepath,
+                'employer_feedback' => $request->feedback,
+                'manager_id' => $request->manager['value'],
+            ]);
+            return redirect()->route('dashboard')->with('message', 'Report Submitted Successfully!');
+        } 
+        if (Auth::user()->hasRole('manager')) {
+            
         }
+        return abort(401, 'Unauthorized');
     }
-
+    
     /**
      * Display the specified resource.
      */

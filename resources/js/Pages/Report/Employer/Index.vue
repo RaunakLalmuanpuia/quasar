@@ -48,7 +48,8 @@
                                 class="rounded-full bg-indigo-200 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
                             /> -->
                             <q-btn
-                                label="Open Modal"
+                                unelevated rounded
+                                label="Verify"
                                 color="primary"
                                 @click="openModal(report)"
                             />
@@ -147,6 +148,7 @@
                         </template>
                     </q-file>
                 </q-card-section>
+                
                 <q-card-section>
                     <label
                         for="
@@ -273,7 +275,7 @@
                 <q-card-actions align="right">
                     <q-btn flat label="Cancel" color="primary" v-close-popup />
                     <!-- add @click function to submit the form below -->
-                    <q-btn flat label="Submit" color="primary" v-close-popup />
+                    <q-btn flat label="Submit" color="primary" v-close-popup @click="onSubmit" />
                 </q-card-actions>
             </q-card>
         </q-dialog>
@@ -297,22 +299,34 @@ const props = defineProps({
 });
 const selectedReport = ref(null);
 
-const openModal = (report) => {
-    selectedReport.value = report;
-    card.value = true;
-};
-
 const form = useForm({
     feedback: "",
     status: "",
-    filepath: "",
+    filepath: null,
     manager: "",
     selectedReport: "",
 });
+
+const openModal = (report) => {
+    selectedReport.value = report;
+    card.value = true;
+    form.selectedReport = selectedReport.value.id;
+};
+
+
 
 // Compute options based on Manager properties
 const managerOptions = Object.keys(props.manager).map((key) => ({
     label: props.manager[key].name,
     value: props.manager[key].id,
 }));
+
+
+
+
+const onSubmit = () => {
+    form.selectedReport = selectedReport.value.id;
+    form.post(route('report.store'));
+}
+
 </script>

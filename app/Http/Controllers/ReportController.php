@@ -9,18 +9,39 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Builder;
 
 class ReportController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         if (Auth::user()->hasRole('employee')) {
-            $employer = Role::where('name', 'employer')->first()->users;
+            
+            $SEARCH = $request->get('search');
+            $employee_id = auth()->user()->id;
+
+            // dd($employee_id);
+            // dd($SEARCH);
+
+            $employee_reports = Report::where('employee_id', $employee_id)
+            ->where(function($query) use ($SEARCH){
+                $query->when($SEARCH, fn(Builder $builder)=>$builder)
+                ->where('name', 'LIKE', "%$SEARCH%")
+                ->orWhere('employer_status','LIKE', "%$SEARCH%");
+            })->paginate(10);
+
+            // $employee_reports = Report::where('employee_id', $employee_id)->get();
+
+            // $q = Report::query();
+            // $employee_reports = $q->where('name')
+
+            // dd($employee_reports);
             return Inertia::render('Report/Employee/Index', [
-                'employer' => $employer,
+               'employee_reports' => $employee_reports,
+               'search' => $SEARCH
             ]);
         }
         if (Auth::user()->hasRole('employer')) {
@@ -60,7 +81,7 @@ class ReportController extends Controller
         // dd($employerPendingFiles);
         if (Auth::user()->hasRole('employee')) {
             $employer = Role::where('name', 'employer')->first()->users;
-            return Inertia::render('Report/Employee/Index', [
+            return Inertia::render('Report/Employee/Create', [
                 'employer' => $employer,
             ]);
         }
@@ -107,6 +128,7 @@ class ReportController extends Controller
             $fileRecord->save();
             return redirect()->route('dashboard')->with('message', 'Report Submitted Successfully!');
         }
+
         if (Auth::user()->hasRole('employer')) {
             $request->validate([
                 'status' => 'required',
@@ -124,6 +146,7 @@ class ReportController extends Controller
             ]);
             return redirect()->route('dashboard')->with('message', 'Report Submitted Successfully!');
         } 
+
         if (Auth::user()->hasRole('manager')) {
             
         }

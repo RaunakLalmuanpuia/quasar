@@ -1,87 +1,81 @@
 <template>
     <QuasarLayout>
-                    
-        <div class="q-pa-md" style="max-width: 400px">
-            
-            <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
-                <q-input
-                    filled
-                    v-model="form.filename"
-                    label="File Name *"
-                    hint="Name of file"
-                    lazy-rules
-                    :rules="[
-                        (val) =>
-                            (val && val.length > 0) || 'Please type something',
-                    ]"
-                />
-                <q-select
-                    rounded
-                    outlined
-                    v-model="form.employer"
-                    :options="employerOptions"
-                    label="Employer"
-                />
-                <q-file rounded outlined bottom-slots v-model="form.filepath" label="File" counter max-files="12">
-                    <template v-slot:before>
-                    <q-icon name="attachment" />
-                    </template>
+        <q-table
+                v-model:pagination="pagination"
+                :rows="employee_reports.data"
+                :columns="columns"
+                :props="props"
+                row-key="name"
+                flat bordered
+                separator="cell"
+                wrap-cells
+                @request="tableData"
+            >
 
+            <template v-slot:top>
+                <span class="text-2xl">Report List</span>
+                <q-space/>
+                <q-input autofocus dense debounce="800" @update:model-value="handleSearch" color="primary" v-model="search" placeholder="Search">
                     <template v-slot:append>
-                    <q-icon v-if="form.filepath !== null" name="close" @click.stop.prevent="form.filepath = null" class="cursor-pointer" />
-                    <q-icon name="search" @click.stop.prevent />
+                        <q-icon name="search"/>
                     </template>
                     
-                </q-file>
-                <div>
-                    <q-btn label="Submit" type="submit" color="primary" />
-                    <q-btn
-                        label="Reset"
-                        type="reset"
-                        color="primary"
-                        flat
-                        class="q-ml-sm"
-                    />
-                </div>
-            </q-form>
-        </div>
+                </q-input>
+            </template>
+
+            <template v-slot:body-cell-id="props">
+                <q-td key="id" :props="props">
+                    {{ props.rowIndex+1 }}
+                </q-td>
+            </template>
+            
+          
+           
+
+           
+            </q-table>
+
     </QuasarLayout>
 </template>
+
 <script setup>
+import {ref} from 'vue'
 import QuasarLayout from "@/Layouts/QuasarLayout.vue";
+import {router} from "@inertiajs/vue3";
 
-import { ref, watch } from "vue";
-import { useForm } from "@inertiajs/vue3";
+const props = defineProps(['employee_reports', 'search']);
+const search = ref(props.search);
 
-
-
-
-const props = defineProps({
-    employer: Object,
-});
-
-const form = useForm({
-    filename: "",
-    filepath: [],
-    employer: "",
-});
-
-// Compute options based on employer properties
-const employerOptions = Object.keys(props.employer).map((key) => ({
-  label: props.employer[key].name,
-  value: props.employer[key].id,
-}));
-
-
-const onSubmit = () => {
+const columns =  [
+    {name:'id', align:'left', label:'Sl No', field:'id',headerClasses:''},//field:row=> 'ID : ${row.id}' //ka append duh chuan
+    {name:'name', align:'left', label:'Name', field:'name',
+        
+    },
+    {name:'employer_status', align:'left', label:'Status', field:'employer_status'},
     
-    form.post(route("report.store"));
-  
-};
+    {name:'employer_status', align:'left', label:'Employee', field:'employer_id'},
+]
 
-const onReset = () => {
-    form.filename = "";
-    form.filepath = [];
-    form.employer = "";
-};
+const pagination = ref({
+    page: props.employee_reports?.current_page || 0,
+    rowsPerPage: props.employee_reports.per_page,
+    rowsNumber: props.employee_reports.total,
+})
+
+function handleSearch(val){
+    search.value = val;
+    tableData({pagination})
+}
+function tableData(props){
+    const {page, rowsPerPage, } = props.pagination;
+    router.get(route('report.index'),{
+        per_page: rowsPerPage,
+        page: page,
+        search:search.value
+    },{})
+}
+
+
+
+
 </script>

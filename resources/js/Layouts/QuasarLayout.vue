@@ -38,7 +38,7 @@
                 <q-route-tab
                     v-if="$page.props.user.roles.includes('employer')"
                     :href="route('report.index')"
-                    label="Employer Report"
+                    label="Employee Report"
                 />
                 <q-route-tab
                     v-if="$page.props.user.roles.includes('manager')"
@@ -50,7 +50,15 @@
                     :href="route('report.create')"
                     label="Upload Report"
                 />
-                <q-route-tab to="/page2" label="View Report" />
+                <q-route-tab
+                    v-if="$page.props.user.roles.includes('employee')"
+                    :href="route('report.index')"
+                    label="View Reports"
+                />
+                <q-route-tab
+                v-if="$page.props.user.roles.includes('employer')"
+                 to="/page2" label="View Reports" />
+                <!-- <q-route-tab to="/page2" label="View Reports" /> -->
                 <q-route-tab to="/page3" label="Contact" />
                 <q-route-tab
                     v-if="$page.props.user.roles.includes('admin')"

@@ -19,29 +19,65 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         if (Auth::user()->hasRole('employee')) {
-            
             $SEARCH = $request->get('search');
             $employee_id = auth()->user()->id;
-
             // dd($employee_id);
             // dd($SEARCH);
 
-            $employee_reports = Report::where('employee_id', $employee_id)
-            ->where(function($query) use ($SEARCH){
-                $query->when($SEARCH, fn(Builder $builder)=>$builder)
-                ->where('name', 'LIKE', "%$SEARCH%")
-                ->orWhere('employer_status','LIKE', "%$SEARCH%");
-            })->paginate(10);
+            // Without getting employer and manager name directly
+            // $employee_reports = Report::where('employee_id', $employee_id)
+            //     ->where(function ($query) use ($SEARCH) {
+            //         $query->when($SEARCH, fn (Builder $builder) => $builder)
+            //             ->where('name', 'LIKE', "%$SEARCH%")
+            //             ->orWhere('employer_status', 'LIKE', "%$SEARCH%")
+            //             ->orWhere('employer_id', 'LIKE', "%$SEARCH%")
+            //             ->orWhere('employer_feedback', 'LIKE', "%$SEARCH%");
+            //     })->latest()->paginate(10);
 
-            // $employee_reports = Report::where('employee_id', $employee_id)->get();
+            // This Works with quasar table
+            $employee_reports =  Report::leftJoin('users as employers', 'employers.id', '=', 'reports.employer_id')
+                ->leftJoin('users as employees', 'employees.id', '=', 'reports.employee_id')
+                ->leftJoin('users as managers', 'managers.id', '=', 'reports.manager_id')
+                ->select('reports.*', 'employers.name as employer_name', 'employees.name as employee_name', 'managers.name as manager_name')
+                ->where('reports.employee_id', $employee_id)
+                ->where(function ($query) use ($SEARCH) {
+                    $query->when($SEARCH, fn (Builder $builder) => $builder)
+                        ->where('reports.name', 'LIKE', "%$SEARCH%")
+                        ->orWhere('reports.employer_status', 'LIKE', "%$SEARCH%")
+                        ->orWhere('reports.employer_id', 'LIKE', "%$SEARCH%")
+                        ->orWhere('employers.name', 'LIKE', "%$SEARCH%")
+                        ->orWhere('reports.employer_feedback', 'LIKE', "%$SEARCH%")
+                        ->orWhere('managers.name', 'LIKE', "%$SEARCH%")
+                        ->orWhere('reports.manager_feedback', 'LIKE', "%$SEARCH%")
+                        ->orWhere('reports.manager_status', 'LIKE', "%$SEARCH%");
+                })->latest()->paginate(10);
+
+            //Using relationship but did not try with quasar table 
+            // $employee_reports = Report::with(['employer', 'employee', 'manager'])
+            //     ->where('employee_id', $employee_id)
+            //     ->where(function ($query) use ($SEARCH) {
+            //         $query->when($SEARCH, function ($builder) use ($SEARCH) {
+            //             $builder->where('reports.name', 'LIKE', "%$SEARCH%")
+            //                 ->orWhere('reports.employer_status', 'LIKE', "%$SEARCH%")
+            //                 ->orWhere('reports.employer_id', 'LIKE', "%$SEARCH%")
+            //                 ->orWhere('employers.name', 'LIKE', "%$SEARCH%") // Assuming 'employers' is the table name for employers
+            //                 ->orWhere('reports.employer_feedback', 'LIKE', "%$SEARCH%")
+            //                 ->orWhere('managers.name', 'LIKE', "%$SEARCH%") // Assuming 'managers' is the table name for managers
+            //                 ->orWhere('reports.manager_feedback', 'LIKE', "%$SEARCH%")
+            //                 ->orWhere('reports.manager_status', 'LIKE', "%$SEARCH%");
+            //         });
+            //     })
+            //     ->latest()
+            //     ->paginate(10);
+
 
             // $q = Report::query();
             // $employee_reports = $q->where('name')
 
             // dd($employee_reports);
             return Inertia::render('Report/Employee/Index', [
-               'employee_reports' => $employee_reports,
-               'search' => $SEARCH
+                'employee_reports' => $employee_reports,
+                'search' => $SEARCH
             ]);
         }
         if (Auth::user()->hasRole('employer')) {
@@ -50,7 +86,8 @@ class ReportController extends Controller
             $employerId = auth()->user()->id; //  get the ID of the currently authenticated user
             $employerPendingFiles =  Report::leftJoin('users as employers', 'employers.id', '=', 'reports.employer_id')
                 ->leftJoin('users as employees', 'employees.id', '=', 'reports.employee_id')
-                ->select('reports.*', 'employers.name as employer_name', 'employees.name as employee_name')
+                ->leftJoin('users as managers', 'managers.id', '=', 'reports.manager_id')
+                ->select('reports.*', 'employers.name as employer_name', 'employees.name as employee_name', 'managers.name as manager_name')
                 ->whereIn('employer_status', ['pending', ''])
                 ->where('employer_id', $employerId)->get(); //filters the Report records based on the condition that the employer_id column should match the ID of the authenticated user.
             // dd($employerPendingFiles);
@@ -138,21 +175,20 @@ class ReportController extends Controller
             $file = $request->file('filepath');
             $filepath = $file->store('public/reports');
             Report::where('id', $request->selectedReport)
-            ->update([
-                'employer_status' => $request->status,
-                'employer_file' => $filepath,
-                'employer_feedback' => $request->feedback,
-                'manager_id' => $request->manager['value'],
-            ]);
+                ->update([
+                    'employer_status' => $request->status,
+                    'employer_file' => $filepath,
+                    'employer_feedback' => $request->feedback,
+                    'manager_id' => $request->manager['value'],
+                ]);
             return redirect()->route('dashboard')->with('message', 'Report Submitted Successfully!');
-        } 
+        }
 
         if (Auth::user()->hasRole('manager')) {
-            
         }
         return abort(401, 'Unauthorized');
     }
-    
+
     /**
      * Display the specified resource.
      */

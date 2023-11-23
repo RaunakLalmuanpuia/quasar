@@ -1,4 +1,5 @@
 <template>
+     <Head title="Upload Report"/>
     <QuasarLayout>
                     
         <div class="q-pa-md" style="max-width: 400px">
@@ -51,10 +52,7 @@
 import QuasarLayout from "@/Layouts/QuasarLayout.vue";
 
 import { ref, watch } from "vue";
-import { useForm } from "@inertiajs/vue3";
-
-
-
+import { useForm, Head } from "@inertiajs/vue3";
 
 const props = defineProps({
     employer: Object,

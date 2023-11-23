@@ -71,10 +71,8 @@ class ReportController extends Controller
             //     ->paginate(10);
 
 
-            // $q = Report::query();
-            // $employee_reports = $q->where('name')
-
             // dd($employee_reports);
+
             return Inertia::render('Report/Employee/Index', [
                 'employee_reports' => $employee_reports,
                 'search' => $SEARCH
@@ -219,7 +217,7 @@ class ReportController extends Controller
      */
     public function update(Request $request, Report $report)
     {
-        //
+        
     }
 
     /**
@@ -227,6 +225,6 @@ class ReportController extends Controller
      */
     public function destroy(Report $report)
     {
-        //
+        
     }
 }

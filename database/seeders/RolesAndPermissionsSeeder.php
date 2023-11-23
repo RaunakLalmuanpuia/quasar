@@ -17,8 +17,11 @@ class RolesAndPermissionsSeeder extends Seeder
         //
         // Reset cached roles and permissions
         app()['cache']->forget('spatie.permission.cache');
-        // create admin role
+        // create roles
         Role::create(['name' => 'admin']);
+        Role::create(['name' => 'employee']);
+        Role::create(['name' => 'employer']);
+        Role::create(['name' => 'manager']);
         // Role::create(['name' => 'user']);
     }
 }

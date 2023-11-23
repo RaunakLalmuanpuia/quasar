@@ -1,4 +1,5 @@
 <template>
+   
     <QuasarLayout>
         <div class="py-2 bg-white sm:py-10">
             <div class="px-6 mx-auto max-w-7xl lg:px-8">
@@ -273,7 +274,7 @@
 <script setup>
 import { ref } from "vue";
 import QuasarLayout from "@/Layouts/QuasarLayout.vue";
-import { usePage, Link, useForm } from "@inertiajs/vue3";
+import { usePage, Link, useForm, Head } from "@inertiajs/vue3";
 import { useQuasar } from "quasar";
 
 const $q = useQuasar();

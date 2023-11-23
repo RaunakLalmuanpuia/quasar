@@ -1,4 +1,5 @@
 <template>
+    <Head title="View Report"/>
     <QuasarLayout>
         <q-table
             v-model:pagination="pagination"
@@ -36,16 +37,24 @@
                     {{ props.rowIndex + 1 }}
                 </q-td>
             </template>
+            <template v-slot:body-cell-employer_feedback="props">
+                <q-td key="employer_feedback" :props="props">
+                <div v-html="props.row.employer_feedback"></div>
+                </q-td>
+            </template>
             <template v-slot:body-cell-actions="props">
                 <q-td key="action" :props="props">
-                    <q-btn
-                        dense
-                        round
-                        flat
-                        color="blue"
-                        @click="EditRow(props.row.id)"
-                        icon="visibility"
-                    ></q-btn>
+                    <a
+                    target="_blank"
+                    :href="route('report.show',props.row.id )">
+                        <q-btn
+                            dense
+                            round
+                            flat
+                            color="blue"
+                            icon="visibility"
+                        ></q-btn>
+                    </a>
                     <q-btn
                         dense
                         round
@@ -54,6 +63,7 @@
                         @click="deleteRow(props.row.id)"
                         icon="delete"
                     ></q-btn>
+                   
                     <q-btn
                         dense
                         round
@@ -79,7 +89,7 @@
 <script setup>
 import { ref } from "vue";
 import QuasarLayout from "@/Layouts/QuasarLayout.vue";
-import { router } from "@inertiajs/vue3";
+import { router, Link, Head } from "@inertiajs/vue3";
 
 const props = defineProps(["employee_reports", "search"]);
 const search = ref(props.search);
@@ -154,5 +164,8 @@ function tableData(props) {
         },
         {}
     );
+}
+function show(id){
+    router.get(route('report.show',id))
 }
 </script>

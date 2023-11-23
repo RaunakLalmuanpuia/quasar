@@ -62,6 +62,7 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
+
     public function report(): HasMany
     {
         return $this->hasMany(Report::class);

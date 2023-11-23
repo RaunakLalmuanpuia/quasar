@@ -48,7 +48,8 @@
                                 class="rounded-full bg-indigo-200 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
                             /> -->
                             <q-btn
-                                unelevated rounded
+                                unelevated
+                                rounded
                                 label="Verify"
                                 color="primary"
                                 @click="openModal(report)"
@@ -148,7 +149,7 @@
                         </template>
                     </q-file>
                 </q-card-section>
-                
+
                 <q-card-section>
                     <label
                         for="
@@ -263,7 +264,13 @@
                 <q-card-actions align="right">
                     <q-btn flat label="Cancel" color="primary" v-close-popup />
                     <!-- add @click function to submit the form below -->
-                    <q-btn flat label="Submit" color="primary" v-close-popup @click="onSubmit" />
+                    <q-btn
+                        flat
+                        label="Submit"
+                        color="primary"
+                        v-close-popup
+                        @click="onSubmit"
+                    />
                 </q-card-actions>
             </q-card>
         </q-dialog>
@@ -277,7 +284,6 @@ import { usePage, Link, useForm } from "@inertiajs/vue3";
 import { useQuasar } from "quasar";
 
 const $q = useQuasar();
-
 
 const options = ["Accepted", "Rejected"];
 
@@ -305,33 +311,24 @@ const openModal = (report) => {
     form.selectedReport = selectedReport.value.id;
 };
 
-
-
 // Compute options based on Manager properties
 const managerOptions = Object.keys(props.manager).map((key) => ({
     label: props.manager[key].name,
     value: props.manager[key].id,
 }));
 
-
 const onSubmit = () => {
     // console.log(form.status);
-    if(form.status !== ''){
+    if (form.status !== "") {
         form.selectedReport = selectedReport.value.id;
-        form.post(route('report.store'));
-    }
-    else if(form.status === '')
-    {
+        form.post(route("report.store"));
+    } else if (form.status === "") {
         $q.notify({
-          message: 'Please select a status for the file',
-          color: 'purple',
-          position: 'top',
-          actions: [
-            { label: 'Dismiss', color: 'white'}
-          ]
-        })
-
+            message: "Please select a status for the file",
+            color: "purple",
+            position: "top",
+            actions: [{ label: "Dismiss", color: "white" }],
+        });
     }
 };
-
 </script>

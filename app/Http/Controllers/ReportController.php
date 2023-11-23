@@ -21,8 +21,7 @@ class ReportController extends Controller
         if (Auth::user()->hasRole('employee')) {
             $SEARCH = $request->get('search');
             $employee_id = auth()->user()->id;
-            // dd($employee_id);
-            // dd($SEARCH);
+
 
             // Without getting employer and manager name directly
             // $employee_reports = Report::where('employee_id', $employee_id)
@@ -79,15 +78,23 @@ class ReportController extends Controller
             ]);
         }
         if (Auth::user()->hasRole('employer')) {
-            $manager = Role::where('name', 'manager')->first()->users;
+            $manager = Role::where('name', 'manager')->first()->users; // put a condition that the value can be null
 
             $employerId = auth()->user()->id; //  get the ID of the currently authenticated user
+
             $employerPendingFiles =  Report::leftJoin('users as employers', 'employers.id', '=', 'reports.employer_id')
                 ->leftJoin('users as employees', 'employees.id', '=', 'reports.employee_id')
                 ->leftJoin('users as managers', 'managers.id', '=', 'reports.manager_id')
                 ->select('reports.*', 'employers.name as employer_name', 'employees.name as employee_name', 'managers.name as manager_name')
                 ->whereIn('employer_status', ['pending', ''])
                 ->where('employer_id', $employerId)->get(); //filters the Report records based on the condition that the employer_id column should match the ID of the authenticated user.
+
+
+            // $employerPendingFiles = Report::with(['employer', 'employee', 'manager'])
+
+            //     ->get();
+
+
             // dd($employerPendingFiles);
             return Inertia::render(
                 'Report/Employer/Index',
@@ -97,8 +104,20 @@ class ReportController extends Controller
                 ]
             );
         }
+
+
         if (Auth::user()->hasRole('manager')) {
-            return Inertia::render('Report/Manager/Index');
+            $manager_id = auth()->user()->id;
+            //get data using models
+            $managerPendingFiles = Report::with(['employee', 'employer'])
+                ->where('manager_id', $manager_id)
+                ->whereIn('employer_status', ['pending', ''])->latest()->paginate(10);
+            // dd($managerPendingFiles);
+
+
+            return Inertia::render('Report/Manager/Index', [
+                'managerPendingFiles' => $managerPendingFiles
+            ]);
         }
         return abort(401, 'Unauthorized');
     }
@@ -122,6 +141,7 @@ class ReportController extends Controller
         }
         if (Auth::user()->hasRole('employer')) {
             $employerId = auth()->user()->id; //  get the ID of the currently authenticated user
+
             $employerPendingFiles =  Report::leftJoin('users as employers', 'employers.id', '=', 'reports.employer_id')
                 ->leftJoin('users as employees', 'employees.id', '=', 'reports.employee_id')
                 ->select('reports.*', 'employers.name as employer_name', 'employees.name as employee_name')
@@ -133,6 +153,8 @@ class ReportController extends Controller
             ]);
         }
         if (Auth::user()->hasRole('manager')) {
+
+
             return Inertia::render('Report/Manager/Index');
         }
         return abort(401, 'Unauthorized');
@@ -217,7 +239,6 @@ class ReportController extends Controller
      */
     public function update(Request $request, Report $report)
     {
-        
     }
 
     /**
@@ -225,6 +246,5 @@ class ReportController extends Controller
      */
     public function destroy(Report $report)
     {
-        
     }
 }

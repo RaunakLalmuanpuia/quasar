@@ -36,15 +36,16 @@
 
             <q-tabs align="left">
                 <q-route-tab
+                    v-if="$page.props.user.roles.includes('admin')"
+                    :href="route('permission_ui.permissions.index')"
+                    label="Roles"
+                />
+                <q-route-tab
                     v-if="$page.props.user.roles.includes('employer')"
                     :href="route('report.index')"
                     label="Employee Report"
                 />
-                <q-route-tab
-                    v-if="$page.props.user.roles.includes('manager')"
-                    :href="route('dashboard')"
-                    label="Manager"
-                />
+
                 <q-route-tab
                     v-if="$page.props.user.roles.includes('employee')"
                     :href="route('report.create')"
@@ -56,15 +57,18 @@
                     label="View Reports"
                 />
                 <q-route-tab
-                v-if="$page.props.user.roles.includes('employer')"
-                 to="/page2" label="View Reports" />
-                <!-- <q-route-tab to="/page2" label="View Reports" /> -->
-                <q-route-tab to="/page3" label="Contact" />
-                <q-route-tab
-                    v-if="$page.props.user.roles.includes('admin')"
-                    :href="route('permission_ui.permissions.index')"
-                    label="Roles"
+                    v-if="$page.props.user.roles.includes('employer')"
+                    to="/page2"
+                    label="View Reports"
                 />
+                <!-- <q-route-tab to="/page2" label="View Reports" /> -->
+
+                <q-route-tab
+                    v-if="$page.props.user.roles.includes('manager')"
+                    :href="route('report.index')"
+                    label="Manager"
+                />
+                <q-route-tab to="/page3" label="Contact" />
             </q-tabs>
         </q-header>
 

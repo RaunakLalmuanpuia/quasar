@@ -39,6 +39,10 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'message' => session('message')
             ],
+            'notification' => $request->user() ? [
+                'notificationCount' => $request->user()->unreadNotifications()->count()
+            ] : null
+
         ];
     }
 }

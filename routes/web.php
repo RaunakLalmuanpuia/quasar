@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\NotificationSeenController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
@@ -40,3 +42,12 @@ Route::resource('report', ReportController::class)->middleware([
     config('jetstream.auth_session'),
     'verified',
 ]);
+Route::get('report/{report}/employee', [ReportController::class, 'viewEmployee'])->name('report.employee.show')->middleware('auth');
+Route::get('report/{report}/employer', [ReportController::class, 'viewEmployer'])->name('report.employer.show')->middleware('auth');
+Route::get('report/{report}/Manager', [ReportController::class, 'viewManager'])->name('report.manager.show')->middleware('auth');
+
+// Route::get('', [NotificationController::class, 'index'])->name('asd');
+
+Route::resource('notification', NotificationController::class)->middleware('auth')->only(['index']);
+
+Route::put('notification/{notification}/seen', NotificationSeenController::class)->middleware('auth')->name('notification.seen');

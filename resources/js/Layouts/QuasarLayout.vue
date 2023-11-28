@@ -14,8 +14,25 @@
                         <q-route-tab :href="route('dashboard')" label="Title" />
                     </q-tabs>
                 </q-toolbar-title>
+                <Link :href="route('notification.index')">
+                    <q-btn
+                        dense
+                        color="blue"
+                        round
+                        icon="notifications"
+                        class="q-ml-md"
+                    >
+                        <q-badge
+                            v-if="page.props.notification.notificationCount > 0"
+                            color="red"
+                            floating
+                            >{{ notificationcount }}</q-badge
+                        >
+                    </q-btn>
+                </Link>
                 <q-btn-dropdown
                     color="primary"
+                    class="ml-4"
                     :label="$page.props.auth.user.name"
                 >
                     <q-list>
@@ -168,8 +185,10 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { router } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
+import { router, usePage, Link } from "@inertiajs/vue3";
+
+const page = usePage();
 
 const link = ref("");
 
@@ -188,4 +207,8 @@ const logout = () => {
     // Use Inertia to visit the logout route
     router.post(route("logout"));
 };
+
+const notificationcount = computed(() =>
+    Math.min(page.props.notification.notificationCount, 9)
+);
 </script>

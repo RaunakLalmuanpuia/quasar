@@ -1,5 +1,4 @@
 <template>
-   
     <QuasarLayout>
         <div class="py-2 bg-white sm:py-10">
             <div class="px-6 mx-auto max-w-7xl lg:px-8">
@@ -49,7 +48,8 @@
                                 class="rounded-full bg-indigo-200 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
                             /> -->
                             <q-btn
-                                unelevated rounded
+                                unelevated
+                                rounded
                                 label="Verify"
                                 color="primary"
                                 @click="openModal(report)"
@@ -61,7 +61,9 @@
                                 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600"
                             >
                                 <a
-                                    :href="route('report.show', report.id)"
+                                    :href="
+                                        route('report.employee.show', report.id)
+                                    "
                                     target="_blank"
                                 >
                                     <span class="absolute inset-0" />
@@ -97,7 +99,9 @@
                         class="text-sm font-bold leading-tight tracking-normal text-gray-800"
                         >Filename:
                         <Link
-                            :href="route('report.show', selectedReport.id)"
+                            :href="
+                                route('report.employee.show', selectedReport.id)
+                            "
                             target="_blank"
                             >{{ selectedReport.name }}
                         </Link>
@@ -149,7 +153,7 @@
                         </template>
                     </q-file>
                 </q-card-section>
-                
+
                 <q-card-section>
                     <label
                         for="
@@ -264,7 +268,13 @@
                 <q-card-actions align="right">
                     <q-btn flat label="Cancel" color="primary" v-close-popup />
                     <!-- add @click function to submit the form below -->
-                    <q-btn flat label="Submit" color="primary" v-close-popup @click="onSubmit" />
+                    <q-btn
+                        flat
+                        label="Submit"
+                        color="primary"
+                        v-close-popup
+                        @click="onSubmit"
+                    />
                 </q-card-actions>
             </q-card>
         </q-dialog>
@@ -278,7 +288,6 @@ import { usePage, Link, useForm, Head } from "@inertiajs/vue3";
 import { useQuasar } from "quasar";
 
 const $q = useQuasar();
-
 
 const options = ["Accepted", "Rejected"];
 
@@ -306,33 +315,24 @@ const openModal = (report) => {
     form.selectedReport = selectedReport.value.id;
 };
 
-
-
 // Compute options based on Manager properties
 const managerOptions = Object.keys(props.manager).map((key) => ({
     label: props.manager[key].name,
     value: props.manager[key].id,
 }));
 
-
 const onSubmit = () => {
     // console.log(form.status);
-    if(form.status !== ''){
+    if (form.status !== "") {
         form.selectedReport = selectedReport.value.id;
-        form.post(route('report.store'));
-    }
-    else if(form.status === '')
-    {
+        form.post(route("report.store"));
+    } else if (form.status === "") {
         $q.notify({
-          message: 'Please select a status for the file',
-          color: 'purple',
-          position: 'top',
-          actions: [
-            { label: 'Dismiss', color: 'white'}
-          ]
-        })
-
+            message: "Please select a status for the file",
+            color: "purple",
+            position: "top",
+            actions: [{ label: "Dismiss", color: "white" }],
+        });
     }
 };
-
 </script>

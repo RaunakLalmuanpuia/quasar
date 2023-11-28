@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\User;
 use Inertia\Inertia;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\ReportVerified;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -105,13 +107,13 @@ class ReportController extends Controller
             );
         }
 
-
         if (Auth::user()->hasRole('manager')) {
             $manager_id = auth()->user()->id;
             //get data using models
             $managerPendingFiles = Report::with(['employee', 'employer'])
                 ->where('manager_id', $manager_id)
-                ->whereIn('employer_status', ['pending', ''])->latest()->paginate(10);
+                ->whereIn('employer_status', ['pending', ''])->latest()->paginate(4);
+
             // dd($managerPendingFiles);
 
 
@@ -128,11 +130,6 @@ class ReportController extends Controller
     public function create()
     {
 
-        // $employerPendingFiles = Report::join('users', 'users.id', '=', 'reports.employer_id')
-        //     ->select('reports.*', 'users.name as employer_name')
-        //     ->get();
-
-        // dd($employerPendingFiles);
         if (Auth::user()->hasRole('employee')) {
             $employer = Role::where('name', 'employer')->first()->users;
             return Inertia::render('Report/Employee/Create', [
@@ -154,8 +151,7 @@ class ReportController extends Controller
         }
         if (Auth::user()->hasRole('manager')) {
 
-
-            return Inertia::render('Report/Manager/Index');
+            return abort(404, 'Not Found');
         }
         return abort(401, 'Unauthorized');
     }
@@ -179,10 +175,19 @@ class ReportController extends Controller
                 'employee_id' => auth()->user()->id,
                 'name' => $request->filename,
                 'employee_file' => $filepath,
-                'employer_id' => $request->employer['value'],
+                'employer_id' => $request->employer['value'], // employer user_id
                 'movement' => Carbon::now()->setTimezone('Asia/Kolkata')->format('y-m-d')
             ]);
             $fileRecord->save();
+            //Notify Employer   
+
+            // $employer_id = $request->employer['value'];
+            // $employer = User::where('id', $employee_id)->first();
+            // $employer->notify(new ReportVerified($fileRecord));
+
+            User::where('id', $request->employer['value'])->first()->notify(new ReportVerified($fileRecord));
+
+
             return redirect()->route('dashboard')->with('message', 'Report Submitted Successfully!');
         }
 
@@ -199,12 +204,30 @@ class ReportController extends Controller
                     'employer_status' => $request->status,
                     'employer_file' => $filepath,
                     'employer_feedback' => $request->feedback,
-                    'manager_id' => $request->manager['value'],
+                    'manager_id' => $request->manager['value'], // manager user_id
                 ]);
+
+            //notify the Manager and the employer
+
             return redirect()->route('dashboard')->with('message', 'Report Submitted Successfully!');
         }
 
         if (Auth::user()->hasRole('manager')) {
+
+            $request->validate([
+                'status' => 'required',
+                'filepath' => 'required|file',
+            ]);
+            $file = $request->file('filepath');
+            $filepath = $file->store('public/reports');
+            Report::where('id', $request->id)
+                ->update([
+                    'manager_status' => $request->status,
+                    'manager_file' => $filepath,
+                    'manager_feedback' => $request->feedback,
+
+                ]);
+            return redirect()->route('report.index')->with('message', 'Report Verified by Manager Successfully!');
         }
         return abort(401, 'Unauthorized');
     }
@@ -215,6 +238,13 @@ class ReportController extends Controller
     public function show(Report $report)
     {
         // dd($report);
+        if (Auth::user()->hasRole('manager')) {
+            $report->load(['employee', 'employer']);
+            // dd($report);
+            return Inertia::render('Report/Manager/Show', [
+                'report' => $report
+            ]);
+        }
         $filepath = $report->employee_file;
         $fileExtension = pathinfo($filepath, PATHINFO_EXTENSION);
         if (in_array($fileExtension, ['pdf', 'jpg', 'jpeg', 'png', 'gif'])) {
@@ -246,5 +276,41 @@ class ReportController extends Controller
      */
     public function destroy(Report $report)
     {
+    }
+    public function viewEmployee(Report $report)
+    {
+        $filepath = $report->employee_file;
+        $fileExtension = pathinfo($filepath, PATHINFO_EXTENSION);
+        if (in_array($fileExtension, ['pdf', 'jpg', 'jpeg', 'png', 'gif'])) {
+            // View the file
+            return response()->file(storage_path('app/' . $filepath));
+        } else {
+            // Download the file with the extension name
+            return Storage::download($filepath, $report->name . '.' . $fileExtension);
+        }
+    }
+    public function viewEmployer(Report $report)
+    {
+        $filepath = $report->employer_file;
+        $fileExtension = pathinfo($filepath, PATHINFO_EXTENSION);
+        if (in_array($fileExtension, ['pdf', 'jpg', 'jpeg', 'png', 'gif'])) {
+            // View the file
+            return response()->file(storage_path('app/' . $filepath));
+        } else {
+            // Download the file with the extension name
+            return Storage::download($filepath, $report->name . '.' . $fileExtension);
+        }
+    }
+    public function viewManager(Report $report)
+    {
+        $filepath = $report->manager_file;
+        $fileExtension = pathinfo($filepath, PATHINFO_EXTENSION);
+        if (in_array($fileExtension, ['pdf', 'jpg', 'jpeg', 'png', 'gif'])) {
+            // View the file
+            return response()->file(storage_path('app/' . $filepath));
+        } else {
+            // Download the file with the extension name
+            return Storage::download($filepath, $report->name . '.' . $fileExtension);
+        }
     }
 }

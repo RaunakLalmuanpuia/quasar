@@ -12,7 +12,10 @@
                         :key="file.id"
                     >
                         <div class="border border-gray-300 p-4 rounded-md mb-4">
-                            <Link v-if="file.id" :href="route('dashboard')">
+                            <Link
+                                v-if="file.id"
+                                :href="route('report.show', file.id)"
+                            >
                                 <div class="flex flex-col items-start gap-2">
                                     <span class="font-bold">{{
                                         file.name

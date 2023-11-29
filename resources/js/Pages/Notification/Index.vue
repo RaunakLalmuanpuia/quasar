@@ -21,66 +21,206 @@
                 v-for="notification in notifications.data"
                 :key="notification.id"
             >
-                <div v-if="$page.props.user.roles.includes('employer')" >
-                    <span
-                        v-if="
-                            notification.type ===
-                            'App\\Notifications\\ReportVerified'
-                        "
-                        >Report was uploaded by
-                        {{ notification.data.employee_name }} with Name
-                        <Link
-                            :href="
-                                route(
-                                    'report.employee.show',
-                                    notification.data.report_id
-                                )
-                            "
-                            class="text-indigo-600"
-                        >
-                            {{ notification.data.filename }}
-                        </Link>
-                    </span>
-                </div>
-                
-                <div v-if="$page.props.user.roles.includes('employee')" >
-                    <div v-if="notification.data.employer_status === 'rejected'">
+                <div v-if="$page.props.user.roles.includes('employer')">
+                    <div v-if="notification.data.manager_status === 'rejected'">
                         <span
-                        v-if="
-                            notification.type ===
-                            'App\\Notifications\\ReportVerified'
-                        "
-                        >Report was Rejected by
-                        {{ notification.data.employer_name }} with File Name
-                        <Link
-                            :href="
-                                route(
-                                    'report.employee.show',
-                                    notification.data.report_id
-                                )
+                            v-if="
+                                notification.type ===
+                                'App\\Notifications\\ReportVerified'
                             "
-                            class="text-indigo-600"
-                        >
-                            {{ notification.data.filename }}
-                        </Link>
-                        <br>
-                        Employer Status : {{ notification.data.employer_status }}
-                        <br>
-                        Employer Feedback: {{ notification.data.employer_feedback}}
-                    </span>
+                            >Report was Rejected by Manager
+                            {{ notification.data.manager_name }} with File Name
+                            <Link
+                                :href="
+                                    route(
+                                        'report.employee.show',
+                                        notification.data.report_id
+                                    )
+                                "
+                                class="text-indigo-600"
+                            >
+                                {{ notification.data.filename }}
+                            </Link>
+                            <br />
+                            Manger Status :
+                            {{ notification.data.manager_status }}
+                            <br />
+                            Manager Feedback:
+                            {{ notification.data.manager_feedback }}
+                        </span>
                     </div>
-                    <div v-if="notification.data.employer_status === 'accepted'">
+                    <div v-if="notification.data.manager_status === 'accepted'">
+                        <span
+                            v-if="
+                                notification.type ===
+                                'App\\Notifications\\ReportVerified'
+                            "
+                            >Report was Approved by Manager Name:
+                            {{ notification.data.manager_name }} with File Name:
+                            <Link
+                                :href="
+                                    route(
+                                        'report.employer.show',
+                                        notification.data.report_id
+                                    )
+                                "
+                                class="text-indigo-600"
+                            >
+                                {{ notification.data.filename }}
+                            </Link>
+                            <br />
+                            Employer Name :
+                            {{ notification.data.employee_name }}
+                            <br />
+                            Manager Status :
+                            {{ notification.data.manager_status }}
+                            <br />
+                            Manager Feedback:
+                            {{ notification.data.manager_feedback }}
+                        </span>
+                    </div>
+                    <div v-else>
+                        <span
+                            v-if="
+                                notification.type ===
+                                'App\\Notifications\\ReportVerified'
+                            "
+                            >Report was uploaded by
+                            {{ notification.data.employee_name }} with Name
+                            <Link
+                                :href="
+                                    route(
+                                        'report.employee.show',
+                                        notification.data.report_id
+                                    )
+                                "
+                                class="text-indigo-600"
+                            >
+                                {{ notification.data.filename }}
+                            </Link>
+                        </span>
+                    </div>
+                </div>
+
+                <div v-if="$page.props.user.roles.includes('employee')">
+                    <div
+                        v-if="notification.data.employer_status === 'rejected'"
+                    >
+                        <span
+                            v-if="
+                                notification.type ===
+                                'App\\Notifications\\ReportVerified'
+                            "
+                            >Report was Rejected by
+                            {{ notification.data.employer_name }} with File Name
+                            <Link
+                                :href="
+                                    route(
+                                        'report.employee.show',
+                                        notification.data.report_id
+                                    )
+                                "
+                                class="text-indigo-600"
+                            >
+                                {{ notification.data.filename }}
+                            </Link>
+                            <br />
+                            Employer Status :
+                            {{ notification.data.employer_status }}
+                            <br />
+                            Employer Feedback:
+                            {{ notification.data.employer_feedback }}
+                        </span>
+                    </div>
+                    <div
+                        v-if="
+                            notification.data.employer_status === 'accepted' &&
+                            notification.data.manager_status === 'pending'
+                        "
+                    >
+                        <span
+                            v-if="
+                                notification.type ===
+                                'App\\Notifications\\ReportVerified'
+                            "
+                            >Report was Approved by
+                            {{ notification.data.employer_name }} with File Name
+                            <Link
+                                :href="
+                                    route(
+                                        'report.employee.show',
+                                        notification.data.report_id
+                                    )
+                                "
+                                class="text-indigo-600"
+                            >
+                                {{ notification.data.filename }}
+                            </Link>
+                            <br />
+                            Employer Status :
+                            {{ notification.data.employer_status }}
+                            <br />
+                            Employer Feedback:
+                            {{ notification.data.employer_feedback }}
+                            <br />
+                            Manager Forwarded to:
+                            {{ notification.data.manager_name }}
+                        </span>
+                    </div>
+                    <div
+                        v-if="
+                            notification.data.manager_status === 'accepted' &&
+                            notification.data.employer_status === 'accepted'
+                        "
+                    >
+                        <span
+                            v-if="
+                                notification.type ===
+                                'App\\Notifications\\ReportVerified'
+                            "
+                            >Report was Further Approved by Manager:
+                            {{ notification.data.manager_name }} with File Name
+                            <Link
+                                :href="
+                                    route(
+                                        'report.employee.show',
+                                        notification.data.report_id
+                                    )
+                                "
+                                class="text-indigo-600"
+                            >
+                                {{ notification.data.filename }}
+                            </Link>
+                            <br />
+                            Employer Name :
+                            {{ notification.data.employer_name }}
+                            <br />
+                            Employer Status :
+                            {{ notification.data.employer_status }}
+                            <br />
+                            Employer Feedback:
+                            {{ notification.data.employer_feedback }}
+                            <br />
+                            Manager Name :
+                            {{ notification.data.manager_name }}
+                            Manager Feedback :
+                            {{ notification.data.manager_feedback }}
+                        </span>
+                    </div>
+                </div>
+
+                <div v-if="$page.props.user.roles.includes('manager')">
                     <span
                         v-if="
                             notification.type ===
                             'App\\Notifications\\ReportVerified'
                         "
-                        >Report was Approved by
-                        {{ notification.data.employer_name }} with File Name
+                        >Report Submitted by Employee:
+                        {{ notification.data.employee_name }} with File Name:
                         <Link
                             :href="
                                 route(
-                                    'report.employee.show',
+                                    'report.show',
                                     notification.data.report_id
                                 )
                             "
@@ -88,22 +228,13 @@
                         >
                             {{ notification.data.filename }}
                         </Link>
-                        <br>
-                        Employer Status : {{ notification.data.employer_status }}
-                        <br>
-                        Employer Feedback: {{ notification.data.employer_feedback}}
+                        <br />
+                        Was Approved by Employer
+                        {{ notification.data.employer_name }}
+                        <br />
+                        Employer Feedback:
+                        {{ notification.data.employer_feedback }}
                     </span>
-                </div>
-                
-                </div>
-                
-                <div v-if="$page.props.user.roles.includes('manager')" >
-                    
-                        
-                        <p>Employee File accepted</p>
-                    
-                    
-                    
                 </div>
                 <div>
                     <Link

@@ -1,12 +1,17 @@
 <template>
     <QuasarLayout>
-        <p>Report Show</p>
+        <h5>Report</h5>
         <p>Report Name: {{ props.report.name }}</p>
         <p>Employee Name: {{ props.report.employee.name }}</p>
         <p>Employer Name: {{ props.report.employer.name }}</p>
         <!-- <p>Employer Feedback: {{ props.report.employer_feedback }}</p> -->
-        <q-btn unelevated
-            rounded label="Employer Feedbaack" color="primary" @click="alert = true" />
+        <q-btn
+            unelevated
+            rounded
+            label="Employer Feedbaack"
+            color="primary"
+            @click="alert = true"
+        />
         <!-- <p>Movement: {{ props.report.movement }}</p> -->
 
         <!-- <a :href="route('report.employee.show', props.report.id)" target="_blank">
@@ -14,50 +19,36 @@
             <p>Employee File</p>
         </div>
     </a> -->
-    <q-dialog v-model="alert">
-      <q-card>
-        <q-card-section>
-          <div class="text-h6">Employer Feedback</div>
-        </q-card-section>
+        <q-dialog v-model="alert">
+            <q-card>
+                <q-card-section>
+                    <div class="text-h6">Employer Feedback</div>
+                </q-card-section>
 
-        <q-card-section class="q-pt-none">
-         <section v-html=" props.report.employer_feedback"></section>
-        </q-card-section>
+                <q-card-section class="q-pt-none">
+                    <section v-html="props.report.employer_feedback"></section>
+                </q-card-section>
 
-        <q-card-actions align="right">
-          <q-btn flat label="OK" color="primary" v-close-popup />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-    
+                <q-card-actions align="right">
+                    <q-btn flat label="OK" color="primary" v-close-popup />
+                </q-card-actions>
+            </q-card>
+        </q-dialog>
+
         <Link
             :href="route('report.employee.show', props.report.id)"
             target="_blank"
         >
-        <q-btn
-            unelevated
-            rounded
-            label="Employee File"
-            color="primary"
-        />
-            
+            <q-btn unelevated rounded label="Employee File" color="primary" />
         </Link>
 
         <a
             :href="route('report.employer.show', props.report.id)"
             target="_blank"
         >
-            <!-- <div>
-                <p>Employer File</p>
-            </div> -->
-            <q-btn
-            unelevated
-            rounded
-            label="Employer File"
-            color="primary"
-        />
+            <q-btn unelevated rounded label="Employer File" color="primary" />
         </a>
-        <br class="mt-4">
+        <br class="mt-4" />
         <q-btn
             unelevated
             rounded

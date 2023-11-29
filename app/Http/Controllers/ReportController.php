@@ -112,7 +112,9 @@ class ReportController extends Controller
             //get data using models
             $managerPendingFiles = Report::with(['employee', 'employer'])
                 ->where('manager_id', $manager_id)
-                ->whereIn('employer_status', ['pending', ''])->latest()->paginate(4);
+                ->where('employer_status', 'accepted') // only employer approved file is shown to manager
+                ->whereIn('manager_status', ['pending', ''])
+                ->latest()->paginate(4);
 
             // dd($managerPendingFiles);
 
@@ -181,12 +183,8 @@ class ReportController extends Controller
 
             // dd($fileRecord);
             $fileRecord->save();
-            //Notify Employer   
 
-            // $employer_id = $request->employer['value'];
-            // $employer = User::where('id', $employee_id)->first();
-            // $employer->notify(new ReportVerified($fileRecord));
-
+            //Notify Employer 
             User::where('id', $request->employer['value'])->first()->notify(new ReportVerified($fileRecord));
 
 
@@ -208,34 +206,31 @@ class ReportController extends Controller
                     'employer_feedback' => $request->feedback,
                     'manager_id' => $request->manager['value'], // manager user_id
                 ]);
-            
+
             // dd($fileRecord);
 
             //notify the Manager and the employer
             //if status is rejected notify the employee and if status is accepted notify both the employer and manager
-            // User::where('id', $request->employer['value'])->first()->notify(new ReportVerified($fileRecord));
-            if($request->status == 'Rejected')
-            {
-                $fileRecord= Report::where('id', $request->selectedReport)->first();
+
+            if ($request->status == 'Rejected') {
+                $fileRecord = Report::where('id', $request->selectedReport)->first();
                 $employee = Report::where('id', $request->selectedReport)->first(['employee_id']);
 
                 // dd(User::find($employee->employee_id));
                 User::find($employee->employee_id)->notify(new ReportVerified($fileRecord));
-            }
-            else
-            {
-                $fileRecord= Report::where('id', $request->selectedReport)->first();
+            } elseif ($request->status == 'Accepted') {
+                $fileRecord = Report::where('id', $request->selectedReport)->first();
                 $employee = Report::where('id', $request->selectedReport)->first(['employee_id']);
 
                 // dd(User::find($employee->employee_id));
                 User::find($employee->employee_id)->notify(new ReportVerified($fileRecord)); // Notify Emoloyee
-                User::where('id', $request->manager['value'])->first()->notify(new ReportVerified($fileRecord));
+                User::where('id', $request->manager['value'])->first()->notify(new ReportVerified($fileRecord)); // Notify Manager
             }
-            return redirect()->route('dashboard')->with('message', 'Report Submitted Successfully!'); // Notify Manager
+            return redirect()->route('dashboard')->with('message', 'Report Submitted Successfully!');
         }
 
         if (Auth::user()->hasRole('manager')) {
-
+            // dd($request->id);
             $request->validate([
                 'status' => 'required',
                 'filepath' => 'required|file',
@@ -249,6 +244,26 @@ class ReportController extends Controller
                     'manager_feedback' => $request->feedback,
 
                 ]);
+
+            //notify the employee and the employer    
+            // If manager approves notify both the employee and emoployer and if manager rejects notify the employer
+
+            if ($request->status == 'Rejected') {
+                $fileRecord = Report::where('id', $request->id)->first();
+                $employer = Report::where('id', $request->id)->first(['employer_id']);
+
+                // dd(User::find($employee->employee_id));
+                User::find($employer->employer_id)->notify(new ReportVerified($fileRecord));
+            } elseif ($request->status == 'Accepted') {
+                $fileRecord = Report::where('id', $request->id)->first();
+                $employee = Report::where('id', $request->id)->first(['employee_id']);
+                $employer = Report::where('id', $request->id)->first(['employer_id']);
+                // dd(User::find($employee->employee_id));
+                User::find($employee->employee_id)->notify(new ReportVerified($fileRecord)); // Notify Emoloyee
+                User::find($employer->employer_id)->notify(new ReportVerified($fileRecord)); // Notify Emoloyer
+
+            }
+
             return redirect()->route('report.index')->with('message', 'Report Verified by Manager Successfully!');
         }
         return abort(401, 'Unauthorized');

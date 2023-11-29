@@ -4,36 +4,66 @@
         <p>Report Name: {{ props.report.name }}</p>
         <p>Employee Name: {{ props.report.employee.name }}</p>
         <p>Employer Name: {{ props.report.employer.name }}</p>
-        <p>Employer Feedback: {{ props.report.employer_feedback }}</p>
-        <p>Movement: {{ props.report.movement }}</p>
+        <!-- <p>Employer Feedback: {{ props.report.employer_feedback }}</p> -->
+        <q-btn unelevated
+            rounded label="Employer Feedbaack" color="primary" @click="alert = true" />
+        <!-- <p>Movement: {{ props.report.movement }}</p> -->
 
         <!-- <a :href="route('report.employee.show', props.report.id)" target="_blank">
         <div>
             <p>Employee File</p>
         </div>
     </a> -->
+    <q-dialog v-model="alert">
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">Employer Feedback</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+         <section v-html=" props.report.employer_feedback"></section>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="OK" color="primary" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+    
         <Link
             :href="route('report.employee.show', props.report.id)"
             target="_blank"
         >
-            <div>
-                <p>Employee File</p>
-            </div>
+        <q-btn
+            unelevated
+            rounded
+            label="Employee File"
+            color="primary"
+        />
+            
         </Link>
 
         <a
             :href="route('report.employer.show', props.report.id)"
             target="_blank"
         >
-            <div>
+            <!-- <div>
                 <p>Employer File</p>
-            </div>
+            </div> -->
+            <q-btn
+            unelevated
+            rounded
+            label="Employer File"
+            color="primary"
+        />
         </a>
+        <br class="mt-4">
         <q-btn
             unelevated
             rounded
             label="Verify"
             color="primary"
+            class="mt-5"
             @click="openModal(report)"
         />
 
@@ -74,7 +104,7 @@
                         <q-btn flat label="Employee File" color="primary" />
                         <!-- <label
                             for="name"
-                            class="text-sm font-bold leading-tight tracking-normal text-gray-800 px-10"
+                            class="px-10 text-sm font-bold leading-tight tracking-normal text-gray-800"
                             >Employee File</label
                         > -->
                     </a>
@@ -253,7 +283,7 @@ const props = defineProps({
     report: Object,
 });
 const options = ["Accepted", "Rejected"];
-
+const alert = ref(false);
 const form = useForm({
     id: "",
     feedback: "",

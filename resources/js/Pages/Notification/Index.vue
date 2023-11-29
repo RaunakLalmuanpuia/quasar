@@ -10,18 +10,18 @@
             </span>
         </div>
 
-        <h1 class="text-3xl mb-4">Your Notifications</h1>
+        <h1 class="mb-4 text-3xl">Your Notifications</h1>
 
         <section
             v-if="notifications.data.length"
             class="text-gray-700 dark:text-gray-400"
         >
             <div
-                class="border-b border-gray-200 dark:border-gray-800 py-4 flex justify-between items-center"
+                class="flex items-center justify-between py-4 border-b border-gray-200 dark:border-gray-800"
                 v-for="notification in notifications.data"
                 :key="notification.id"
             >
-                <div>
+                <div v-if="$page.props.user.roles.includes('employer')" >
                     <span
                         v-if="
                             notification.type ===
@@ -42,6 +42,69 @@
                         </Link>
                     </span>
                 </div>
+                
+                <div v-if="$page.props.user.roles.includes('employee')" >
+                    <div v-if="notification.data.employer_status === 'rejected'">
+                        <span
+                        v-if="
+                            notification.type ===
+                            'App\\Notifications\\ReportVerified'
+                        "
+                        >Report was Rejected by
+                        {{ notification.data.employer_name }} with File Name
+                        <Link
+                            :href="
+                                route(
+                                    'report.employee.show',
+                                    notification.data.report_id
+                                )
+                            "
+                            class="text-indigo-600"
+                        >
+                            {{ notification.data.filename }}
+                        </Link>
+                        <br>
+                        Employer Status : {{ notification.data.employer_status }}
+                        <br>
+                        Employer Feedback: {{ notification.data.employer_feedback}}
+                    </span>
+                    </div>
+                    <div v-if="notification.data.employer_status === 'accepted'">
+                    <span
+                        v-if="
+                            notification.type ===
+                            'App\\Notifications\\ReportVerified'
+                        "
+                        >Report was Approved by
+                        {{ notification.data.employer_name }} with File Name
+                        <Link
+                            :href="
+                                route(
+                                    'report.employee.show',
+                                    notification.data.report_id
+                                )
+                            "
+                            class="text-indigo-600"
+                        >
+                            {{ notification.data.filename }}
+                        </Link>
+                        <br>
+                        Employer Status : {{ notification.data.employer_status }}
+                        <br>
+                        Employer Feedback: {{ notification.data.employer_feedback}}
+                    </span>
+                </div>
+                
+                </div>
+                
+                <div v-if="$page.props.user.roles.includes('manager')" >
+                    
+                        
+                        <p>Employee File accepted</p>
+                    
+                    
+                    
+                </div>
                 <div>
                     <Link
                         :href="route('notification.seen', notification.id)"
@@ -59,14 +122,14 @@
 
         <section
             v-if="notifications.data.length"
-            class="w-full flex justify-center mt-8 mb-8"
+            class="flex justify-center w-full mt-8 mb-8"
         >
             <div class="flex justify-center mt-4">
                 <div class="flex gap-1">
                     <Link
                         v-for="(link, index) in notifications.links"
                         :key="index"
-                        class="py-2 px-4 rounded-md"
+                        class="px-4 py-2 rounded-md"
                         :href="link.url || ''"
                         :class="{
                             'bg-indigo-500 dark:bg-indigo-800 text-gray-300':

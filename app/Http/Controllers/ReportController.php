@@ -178,6 +178,8 @@ class ReportController extends Controller
                 'employer_id' => $request->employer['value'], // employer user_id
                 'movement' => Carbon::now()->setTimezone('Asia/Kolkata')->format('y-m-d')
             ]);
+
+            // dd($fileRecord);
             $fileRecord->save();
             //Notify Employer   
 
@@ -206,10 +208,30 @@ class ReportController extends Controller
                     'employer_feedback' => $request->feedback,
                     'manager_id' => $request->manager['value'], // manager user_id
                 ]);
+            
+            // dd($fileRecord);
 
             //notify the Manager and the employer
+            //if status is rejected notify the employee and if status is accepted notify both the employer and manager
+            // User::where('id', $request->employer['value'])->first()->notify(new ReportVerified($fileRecord));
+            if($request->status == 'Rejected')
+            {
+                $fileRecord= Report::where('id', $request->selectedReport)->first();
+                $employee = Report::where('id', $request->selectedReport)->first(['employee_id']);
 
-            return redirect()->route('dashboard')->with('message', 'Report Submitted Successfully!');
+                // dd(User::find($employee->employee_id));
+                User::find($employee->employee_id)->notify(new ReportVerified($fileRecord));
+            }
+            else
+            {
+                $fileRecord= Report::where('id', $request->selectedReport)->first();
+                $employee = Report::where('id', $request->selectedReport)->first(['employee_id']);
+
+                // dd(User::find($employee->employee_id));
+                User::find($employee->employee_id)->notify(new ReportVerified($fileRecord)); // Notify Emoloyee
+                User::where('id', $request->manager['value'])->first()->notify(new ReportVerified($fileRecord));
+            }
+            return redirect()->route('dashboard')->with('message', 'Report Submitted Successfully!'); // Notify Manager
         }
 
         if (Auth::user()->hasRole('manager')) {

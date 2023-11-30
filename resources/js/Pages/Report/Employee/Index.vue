@@ -37,6 +37,7 @@
                     {{ props.rowIndex + 1 }}
                 </q-td>
             </template>
+            
             <template v-slot:body-cell-employer_feedback="props">
                 <q-td key="employer_feedback" :props="props">
                     <div v-html="props.row.employer_feedback"></div>
@@ -112,9 +113,15 @@ const columns = [
     }, //field:row=> 'ID : ${row.id}' //ka append duh chuan
     { name: "name", align: "left", label: "Name", field: "name" },
     {
+        name: "employer_name",
+        align: "left",
+        label: "Employer Name",
+        field: "employer_name",
+    },
+    {
         name: "employer_status",
         align: "left",
-        label: "Status",
+        label: "Employer Status",
         field: "employer_status",
     },
 

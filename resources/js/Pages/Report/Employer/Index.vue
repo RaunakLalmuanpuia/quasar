@@ -16,7 +16,7 @@
                     class="grid max-w-2xl grid-cols-1 pt-5 mx-auto mt-5 border-t border-gray-200 gap-x-8 gap-y-16 sm:mt-6 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3"
                 >
                     <div
-                        v-for="report in employerPendingFiles"
+                        v-for="report in employerPendingFiles.data"
                         :key="report.id"
                         class="flex flex-col items-start justify-between max-w-xl"
                     >
@@ -27,26 +27,7 @@
                             >
                                 {{ report.created_at }}
                             </time>
-                            <!-- <p>
-                                {{ report }}
-                                {{
-                                    report.employer_id.value ===
-                                    $page.props.user.id
-                                }}
-                            </p> -->
-
-                            <!-- <button
-                                @click="openModal(report)"
-                                class="relative z-10 rounded-full bg-indigo-200 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
-                            >
-                                Verify
-                            </button> -->
-                            <!-- <q-btn
-                                label="Card"
-                                color="primary"
-                                @click="selectedReport(report)"
-                                class="rounded-full bg-indigo-200 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
-                            /> -->
+                           
                             <q-btn
                                 unelevated
                                 rounded
@@ -84,6 +65,21 @@
                 </div>
             </div>
         </div>
+        <div class="flex justify-center mt-4">
+                <div class="flex gap-1">
+                    <Link
+                        v-for="(link, index) in employerPendingFiles.links"
+                        :key="index"
+                        class="px-4 py-2 rounded-md"
+                        :href="link.url || ''"
+                        :class="{
+                            'bg-indigo-500 dark:bg-indigo-800 text-gray-300':
+                                link.active,
+                        }"
+                        v-html="link.label"
+                    />
+                </div>
+            </div>
         <q-dialog v-model="card">
             <q-card>
                 <q-card-section>

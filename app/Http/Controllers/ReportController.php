@@ -89,7 +89,7 @@ class ReportController extends Controller
                 ->leftJoin('users as managers', 'managers.id', '=', 'reports.manager_id')
                 ->select('reports.*', 'employers.name as employer_name', 'employees.name as employee_name', 'managers.name as manager_name')
                 ->whereIn('employer_status', ['pending', ''])
-                ->where('employer_id', $employerId)->get(); //filters the Report records based on the condition that the employer_id column should match the ID of the authenticated user.
+                ->where('employer_id', $employerId)->latest()->paginate(3); //filters the Report records based on the condition that the employer_id column should match the ID of the authenticated user.
 
 
             // $employerPendingFiles = Report::with(['employer', 'employee', 'manager'])

@@ -298,7 +298,15 @@ class ReportController extends Controller
      */
     public function edit(Report $report)
     {
-        //
+        // dd($report->load('employee', 'employer', 'manager'));
+        // dd($report->with(['employee', 'employer', 'manager'])->get());
+        if (Auth::user()->hasRole('employee')) {
+            $employer = Role::where('name', 'employer')->first()->users;
+            return Inertia::render('Report/Employee/Edit', [
+                'report' => $report->load('employer'),
+                'employer' => $employer
+            ]);
+        }
     }
 
     /**
@@ -306,6 +314,20 @@ class ReportController extends Controller
      */
     public function update(Request $request, Report $report)
     {
+        // dd($request);
+        if (Auth::user()->hasRole('employee')) {
+            // dd($request->file_name);
+            // dd($request->file('file_path'));
+
+            // $file = $request->file('file_path');
+            // $filepath = $file->store('public/reports');
+
+            $report->name = $request->file_name;
+            $report->employee_file = $request->file_path;
+            $report->employer_id =  $request->employer_id['value'];
+            $report->save();
+            return redirect()->route('report.index')->with('message', 'Report Updated Successfully');
+        }
     }
 
     /**

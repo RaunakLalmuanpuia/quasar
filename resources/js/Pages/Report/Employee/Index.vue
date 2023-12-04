@@ -37,7 +37,7 @@
                     {{ props.rowIndex + 1 }}
                 </q-td>
             </template>
-            
+
             <template v-slot:body-cell-employer_feedback="props">
                 <q-td key="employer_feedback" :props="props">
                     <div v-html="props.row.employer_feedback"></div>
@@ -64,6 +64,7 @@
                             icon="visibility"
                         ></q-btn>
                     </a>
+
                     <q-btn
                         dense
                         round
@@ -72,15 +73,15 @@
                         @click="deleteRow(props.row.id)"
                         icon="delete"
                     ></q-btn>
-
-                    <q-btn
-                        dense
-                        round
-                        flat
-                        color="blue"
-                        @click="EditRow(props.row.id)"
-                        icon="edit"
-                    ></q-btn>
+                    <Link :href="route('report.edit', props.row.id)">
+                        <q-btn
+                            dense
+                            round
+                            flat
+                            color="blue"
+                            icon="edit"
+                        ></q-btn>
+                    </Link>
                     <q-btn
                         dense
                         round

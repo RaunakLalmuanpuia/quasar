@@ -17,32 +17,26 @@
                 outlined
                 v-model="form.employer_id"
                 :options="employerOptions"
-                label="employer_name"
-                tabindex="form.employer_name"
-                getOptionLabel="form.employer_name"
+                label="Employer Name"
+                
+                
             />
-            <q-file
-                rounded
-                outlined
-                bottom-slots
-                v-model="form.file_path"
-                label="File"
-                counter
-                max-files="12"
-            >
-                <template v-slot:before>
+            <p>Current Employer: {{ props.report.employer.name }}</p>
+            <q-file rounded
+                    outlined
+                    bottom-slots
+                    v-model="form.filepath"
+                    label="File" 
+                    counter max-files="1">
+                    <template v-slot:before>
                     <q-icon name="attachment" />
-                </template>
+                    </template>
 
-                <template v-slot:append>
-                    <q-icon
-                        v-if="form.file_path !== null"
-                        name="close"
-                        @click.stop.prevent="form.file_path = null"
-                        class="cursor-pointer"
-                    />
+                    <template v-slot:append>
+                    <q-icon v-if="form.filepath !== null" name="close" @click.stop.prevent="form.filepath = null" class="cursor-pointer" />
                     <q-icon name="search" @click.stop.prevent />
-                </template>
+                    </template>
+                    
             </q-file>
 
             <q-toggle v-model="accept" label="Confirm Edit" />
@@ -58,6 +52,13 @@
                 />
             </div>
         </q-form>
+        <Link
+            :href="route('report.employee.show', props.report.id)"
+            class="text-indigo-600"
+        >
+            <p>Employee file</p>
+        </Link>
+        <p>Employer Status: {{ props.report.employer_status }}</p>
 
         <p>Employer Feedback : {{ props.report.employer_feedback }}</p>
 
@@ -88,7 +89,7 @@ const form = useForm({
     id: props.report.id,
     employer_name: props.report.employer.name,
     file_name: props.report.name,
-    file_path: [],
+    filepath: [],
     employer_id: "",
 });
 
@@ -101,7 +102,9 @@ const onSubmit = () => {
             message: "Please Confirm",
         });
     } else {
-        form.put(route("report.update", props.report.id));
+        // form.put(route("report.update", props.report.id));
+        form.post(route("update_employee", props.report.id));
+        
         $q.notify({
             color: "green-4",
             textColor: "white",
@@ -112,10 +115,11 @@ const onSubmit = () => {
     // form.put(route("report.update", props.report.id));
 };
 
+
 const onReset = () => {
     form.file_name = props.report.name;
     form.filepath = [];
-    form.employer_name = props.report.employer.name;
+    form.employer_id = "";
 };
 
 // Compute options based on employer properties
@@ -123,4 +127,7 @@ const employerOptions = Object.keys(props.employer).map((key) => ({
     label: props.employer[key].name,
     value: props.employer[key].id,
 }));
+
+
+
 </script>

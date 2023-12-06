@@ -23,7 +23,12 @@
                     :options="employerOptions"
                     label="Employer"
                 />
-                <q-file rounded outlined bottom-slots v-model="form.filepath" label="File" counter max-files="12">
+                <q-file rounded
+                 outlined
+                  bottom-slots
+                   v-model="form.filepath"
+                    label="File" 
+                    counter max-files="1">
                     <template v-slot:before>
                     <q-icon name="attachment" />
                     </template>
@@ -51,7 +56,7 @@
 <script setup>
 import QuasarLayout from "@/Layouts/QuasarLayout.vue";
 
-import { ref, watch } from "vue";
+
 import { useForm, Head } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -72,9 +77,7 @@ const employerOptions = Object.keys(props.employer).map((key) => ({
 
 
 const onSubmit = () => {
-    
     form.post(route("report.store"));
-  
 };
 
 const onReset = () => {

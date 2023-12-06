@@ -164,6 +164,7 @@ class ReportController extends Controller
     public function store(Request $request)
     {
         if (Auth::user()->hasRole('employee')) {
+            dd($request->file('filepath'));
             $request->validate([
                 'filename' => 'required|string',
                 'filepath' => 'required|file',
@@ -298,6 +299,7 @@ class ReportController extends Controller
      */
     public function edit(Report $report)
     {
+        
         // dd($report->load('employee', 'employer', 'manager'));
         // dd($report->with(['employee', 'employer', 'manager'])->get());
         if (Auth::user()->hasRole('employee')) {
@@ -314,17 +316,19 @@ class ReportController extends Controller
      */
     public function update(Request $request, Report $report)
     {
-        // dd($request);
+
+        dd($request);
         if (Auth::user()->hasRole('employee')) {
             // dd($request->file_name);
-            // dd($request->file('file_path'));
-
-            // $file = $request->file('file_path');
-            // $filepath = $file->store('public/reports');
-
+            // dd($request->filepath);
             $report->name = $request->file_name;
-            $report->employee_file = $request->file_path;
-            $report->employer_id =  $request->employer_id['value'];
+            $file = $request->file('filepath');
+            $filepath = $file->store('public/reports');
+            $report->employee_file = $filepath;
+           
+            if ($request->employer_id !== null && is_array($request->employer_id) && array_key_exists('value', $request->employer_id)) {
+                $report->employer_id = $request->employer_id['value'];
+            }
             $report->save();
             return redirect()->route('report.index')->with('message', 'Report Updated Successfully');
         }
@@ -370,6 +374,24 @@ class ReportController extends Controller
         } else {
             // Download the file with the extension name
             return Storage::download($filepath, $report->name . '.' . $fileExtension);
+        }
+    }
+
+    public function update_employee(Request $request, Report $report){
+        
+        if (Auth::user()->hasRole('employee')) {
+            // dd($request->file_name);
+            // dd($request->filepath);
+            $report->name = $request->file_name;
+            $file = $request->file('filepath');
+            $filepath = $file->store('public/reports');
+            $report->employee_file = $filepath;
+           
+            if ($request->employer_id !== null && is_array($request->employer_id) && array_key_exists('value', $request->employer_id)) {
+                $report->employer_id = $request->employer_id['value'];
+            }
+            $report->save();
+            return redirect()->route('report.index')->with('message', 'Report Updated Successfully');
         }
     }
 }

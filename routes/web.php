@@ -42,6 +42,9 @@ Route::resource('report', ReportController::class)->middleware([
     config('jetstream.auth_session'),
     'verified',
 ]);
+
+Route::post('update_employee/{report}/employee', [ReportController::class, 'update_employee'])->name('update_employee');
+
 Route::get('report/{report}/employee', [ReportController::class, 'viewEmployee'])->name('report.employee.show')->middleware('auth');
 Route::get('report/{report}/employer', [ReportController::class, 'viewEmployer'])->name('report.employer.show')->middleware('auth');
 Route::get('report/{report}/Manager', [ReportController::class, 'viewManager'])->name('report.manager.show')->middleware('auth');
